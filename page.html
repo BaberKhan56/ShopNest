@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopNest</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="container page">
+    <div class="crumbs"><a href="index.html">Home</a> › <span id="crumb"></span></div>
+    <article class="info" id="content"></article>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="data.js"></script>
+  <script src="common.js"></script>
+  <script>
+    // One template for every information page: page.html?p=<slug>
+    const DEMO = "This is a demo storefront, so nothing on this page is real.";
+    const PAGES = {
+      all: { title: "All Categories", intro: "Browse everything we have in the demo store.", categories: true },
+      service: { title: "Customer Service", body: [
+        "In a real store this page would help customers track orders, manage returns and contact support.",
+        DEMO ],
+        links: [["Returns & Orders", "page.html?p=returns"], ["Help Center", "page.html?p=help"], ["Delivery information", "page.html?p=delivery"]] },
+      registry: { title: "Registry", body: [
+        "Gift registries let people create a wish list for weddings, birthdays and new homes, and share it with friends and family.",
+        "Registry is not implemented in this demo project, but it is a good feature to build next." ] },
+      giftcards: { title: "Gift Cards", body: [
+        "Gift cards would let customers send credit to friends and family by email or as a printed card.",
+        "No gift cards can be bought or redeemed here. " + DEMO ] },
+      sell: { title: "Sell on ShopNest", body: [
+        "A seller portal would let merchants list products, manage inventory and track payouts.",
+        "This demo has no seller accounts. " + DEMO ] },
+      affiliate: { title: "Affiliate Program", body: [
+        "An affiliate programme lets creators and website owners earn a commission by recommending products.",
+        "There is no real programme here, so there is nothing to sign up for." ] },
+      advertise: { title: "Advertise with Us", body: [
+        "Sponsored product listings and banner placements would be managed from this section.",
+        "No advertising is sold in this demo project." ] },
+      about: { title: "About ShopNest", body: [
+        "ShopNest is a demo e-commerce storefront built with plain HTML, CSS and JavaScript as a front-end learning project.",
+        "It uses a fictional brand and emoji instead of product photos. No orders are placed and no payments are taken.",
+        "You can browse categories, search, view product pages and manage a cart that is stored in your browser." ] },
+      careers: { title: "Careers", body: [
+        "A real careers page would list open roles and how to apply.",
+        "ShopNest is a demo, so there are no jobs to apply for." ] },
+      press: { title: "Press", body: [
+        "Press releases, brand assets and media contacts would live here.",
+        "There is nothing to publish for this demo project." ] },
+      cards: { title: "Payment: Credit & Debit Cards", body: [
+        "A real checkout would accept major credit and debit cards through a secure payment provider.",
+        "Card payments are not implemented here. Never enter real card details into a demo site." ] },
+      upi: { title: "Payment: UPI", body: [
+        "UPI payments would let customers pay instantly from their bank account using a UPI app.",
+        "UPI is not connected in this demo, and no payment can be made." ] },
+      emi: { title: "Payment: EMI", body: [
+        "EMI (equated monthly instalments) options would let customers split larger purchases into monthly payments.",
+        "No EMI plans exist in this demo project." ] },
+      account: { title: "Your Account", body: [
+        "Sign-in, saved addresses, order history and wish lists would be managed from this page.",
+        "Accounts are not implemented in this demo. Your cart is simply saved in this browser." ],
+        links: [["View your cart", "cart.html"], ["Returns & Orders", "page.html?p=returns"]] },
+      returns: { title: "Returns & Orders", body: [
+        "A real store would show past orders here, with options to track packages, return items or buy again.",
+        "Because no orders can be placed in this demo, there is no order history to show." ],
+        links: [["Go to your cart", "cart.html"]] },
+      help: { title: "Help Center", body: [
+        "Common questions would be answered here: shipping times, returns, payments, and how to contact support.",
+        DEMO ],
+        links: [["Delivery information", "page.html?p=delivery"], ["Customer Service", "page.html?p=service"], ["Payment options", "page.html?p=cards"]] },
+      delivery: { title: "Delivery Information", body: [
+        "A real store would let you enter a pin code to see delivery dates and shipping options for your area.",
+        "The \"Deliver to\" button is a placeholder in this demo." ] },
+      checkout: { title: "Checkout", body: [
+        "Checkout is not implemented in this demo, so no order has been placed and nothing was charged.",
+        "A real checkout would collect a delivery address and payment method, then confirm the order.",
+        "Good next steps: add an address form, an order summary and a confirmation page." ],
+        links: [["Back to your cart", "cart.html"], ["Continue shopping", "index.html"]] }
+    };
+
+    (function () {
+      const slug = params.get("p");
+      const page = PAGES[slug];
+      const box = document.getElementById("content");
+
+      if (!page) {
+        document.getElementById("crumb").textContent = "Page not found";
+        box.innerHTML = '<h1>Page not found</h1><p>That page doesn\'t exist.</p>' +
+          '<a class="btn" href="index.html">Back to home</a>';
+        return;
+      }
+
+      document.title = page.title + " – ShopNest";
+      document.getElementById("crumb").textContent = page.title;
+
+      let html = "<h1>" + esc(page.title) + "</h1>";
+      if (page.intro) html += "<p>" + esc(page.intro) + "</p>";
+      (page.body || []).forEach(t => (html += "<p>" + esc(t) + "</p>"));
+
+      let links = page.links ? page.links.slice() : [];
+      if (page.categories) {
+        links = Object.entries(CATEGORIES).map(([k, v]) => [v, "category.html?c=" + k]);
+        links.push(["Today's Deals", "category.html?deals=1"], ["Everything", "category.html?c=all"]);
+      }
+      if (links.length) {
+        html += '<ul class="linklist">' +
+          links.map(([label, href]) => '<li><a href="' + href + '">' + esc(label) + "</a></li>").join("") +
+          "</ul>";
+      }
+      html += '<a class="btn" href="index.html">Continue shopping</a>';
+      box.innerHTML = html;
+    })();
+  </script>
+</body>
+</html>

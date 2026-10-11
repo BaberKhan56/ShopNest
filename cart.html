@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Cart – ShopNest</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="container page" id="cartRoot"></main>
+
+  <div id="site-footer"></div>
+
+  <script src="data.js"></script>
+  <script src="common.js"></script>
+  <script>
+    (function () {
+      const root = document.getElementById("cartRoot");
+
+      function render() {
+        const cart = getCart();
+        const lines = Object.entries(cart)
+          .map(([id, q]) => ({ p: PRODUCTS.find(x => x.id === Number(id)), q }))
+          .filter(l => l.p && l.q > 0);
+
+        if (!lines.length) {
+          root.innerHTML = '<div class="info"><h1>Your ShopNest cart is empty</h1>' +
+            '<p>Add a few products and they will show up here.</p>' +
+            '<a class="btn" href="index.html">Continue shopping</a></div>';
+          return;
+        }
+
+        const items = lines.reduce((s, l) => s + l.q, 0);
+        const subtotal = lines.reduce((s, l) => s + l.p.price * l.q, 0);
+
+        root.innerHTML = `
+          <div class="cartbox">
+            <section class="cartlist">
+              <h1>Shopping Cart</h1>
+              ${lines.map(({ p, q }) => `
+                <div class="line">
+                  <a class="thumb" href="product.html?id=${p.id}">${p.emoji}</a>
+                  <div>
+                    <a class="lname" href="product.html?id=${p.id}">${esc(p.name)}</a>
+                    <div class="meta">In stock · Free delivery</div>
+                    <div class="qty">
+                      <button data-act="dec" data-id="${p.id}" aria-label="Decrease quantity">−</button>
+                      <span>${q}</span>
+                      <button data-act="inc" data-id="${p.id}" aria-label="Increase quantity">+</button>
+                      <button class="rm" data-act="rm" data-id="${p.id}">Delete</button>
+                    </div>
+                  </div>
+                  <div class="lprice">${rupee(p.price * q)}</div>
+                </div>`).join("")}
+              <div class="clearrow"><button class="rm" data-act="clear">Clear cart</button></div>
+            </section>
+            <aside class="summary">
+              <p>Subtotal (${items} item${items === 1 ? "" : "s"}): <strong>${rupee(subtotal)}</strong></p>
+              <a class="btn alt" href="page.html?p=checkout">Proceed to checkout</a>
+              <a class="btn" href="index.html">Continue shopping</a>
+            </aside>
+          </div>`;
+      }
+
+      root.addEventListener("click", e => {
+        const b = e.target.closest("[data-act]");
+        if (!b) return;
+        const cart = getCart();
+        const id = b.dataset.id;
+        const act = b.dataset.act;
+        if (act === "inc") cart[id] = (cart[id] || 0) + 1;
+        if (act === "dec") cart[id] = Math.max(0, (cart[id] || 0) - 1);
+        if (act === "rm" || (act === "dec" && cart[id] === 0)) delete cart[id];
+        if (act === "clear") Object.keys(cart).forEach(k => delete cart[k]);
+        saveCart(cart);
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

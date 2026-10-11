@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Product – ShopNest</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="container page" id="root"></main>
+
+  <div id="site-footer"></div>
+
+  <script src="data.js"></script>
+  <script src="common.js"></script>
+  <script>
+    (function () {
+      const root = document.getElementById("root");
+      const p = PRODUCTS.find(x => x.id === Number(params.get("id")));
+
+      if (!p) {
+        root.innerHTML = '<div class="info"><h1>Product not found</h1>' +
+          '<p>We couldn\'t find that product.</p><a class="btn" href="index.html">Back to home</a></div>';
+        return;
+      }
+
+      document.title = p.name + " – ShopNest";
+      const off = p.mrp ? Math.round((1 - p.price / p.mrp) * 100) : 0;
+      const related = PRODUCTS.filter(x => x.category === p.category && x.id !== p.id).slice(0, 6);
+      const qtyOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option>${n}</option>`).join("");
+
+      root.innerHTML = `
+        <div class="crumbs">
+          <a href="index.html">Home</a> ›
+          <a href="category.html?c=${p.category}">${esc(CATEGORIES[p.category])}</a> ›
+          <span>${esc(p.name)}</span>
+        </div>
+        <section class="detail">
+          <div class="big">${p.emoji}</div>
+          <div>
+            <h1>${esc(p.name)}</h1>
+            <div class="stars">${stars(p.rating)}</div>
+            <hr />
+            ${p.mrp ? `<div><span class="off">-${off}%</span></div>` : ""}
+            <div class="price">${rupee(p.price)}${p.mrp ? ` <span class="mrp">M.R.P.: ${rupee(p.mrp)}</span>` : ""}</div>
+            <p class="desc">${esc(p.desc)}</p>
+            <p class="meta">Free delivery on demo orders · In stock</p>
+            <div class="buyrow">
+              <label>Qty: <select id="qty">${qtyOptions}</select></label>
+              <button class="btn" id="addBtn">Add to Cart</button>
+              <button class="btn alt" id="buyBtn">Buy Now</button>
+            </div>
+          </div>
+        </section>
+        ${related.length ? `
+        <section class="row">
+          <h3>More in ${esc(CATEGORIES[p.category])} <a class="more" href="category.html?c=${p.category}">See all</a></h3>
+          <div class="scroller">${related.map(productCardHTML).join("")}</div>
+        </section>` : ""}`;
+
+      const qty = () => Number(document.getElementById("qty").value);
+      document.getElementById("addBtn").addEventListener("click", e => {
+        addToCart(p.id, qty());
+        e.target.textContent = "Added ✓";
+        setTimeout(() => (e.target.textContent = "Add to Cart"), 1200);
+      });
+      document.getElementById("buyBtn").addEventListener("click", () => {
+        addToCart(p.id, qty());
+        location.href = "cart.html";
+      });
+    })();
+  </script>
+</body>
+</html>

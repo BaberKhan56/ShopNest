@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopNest – Online Shopping Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <!-- Hero carousel -->
+  <section class="hero">
+    <div class="slides" id="slides">
+      <a class="slide s1" href="category.html?c=electronics"><h2>Big savings on electronics</h2><p>Up to 40% off top gadgets</p><span class="cta">Shop now</span></a>
+      <a class="slide s2" href="category.html?c=home"><h2>Refresh your home</h2><p>Decor, kitchen &amp; more</p><span class="cta">Shop now</span></a>
+      <a class="slide s3" href="category.html?c=books"><h2>Back-to-reading sale</h2><p>Bestsellers from ₹199</p><span class="cta">Shop now</span></a>
+    </div>
+    <button class="arrow left" id="prev" aria-label="Previous">❮</button>
+    <button class="arrow right" id="next" aria-label="Next">❯</button>
+    <div class="fade"></div>
+  </section>
+
+  <main class="container">
+    <!-- Category cards -->
+    <section class="cards" id="cards"></section>
+
+    <!-- Product rows -->
+    <section class="row">
+      <h3>Best sellers in Electronics <a class="more" href="category.html?c=electronics">See all</a></h3>
+      <div class="scroller" id="row1"></div>
+    </section>
+
+    <section class="row">
+      <h3>Recommended for you <a class="more" href="category.html?c=all">See all</a></h3>
+      <div class="scroller" id="row2"></div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="data.js"></script>
+  <script src="common.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Products – ShopNest</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="container page">
+    <div class="crumbs"><a href="index.html">Home</a> › <span id="crumb">Products</span></div>
+    <div class="listhead">
+      <h1 id="title">Products</h1>
+      <div class="tools">
+        <span id="count"></span>
+        <label>Sort by
+          <select id="sort">
+            <option value="featured">Featured</option>
+            <option value="low">Price: Low to High</option>
+            <option value="high">Price: High to Low</option>
+            <option value="rating">Avg. Customer Rating</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <div class="grid-products" id="list"></div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="data.js"></script>
+  <script src="common.js"></script>
+  <script>
+    (function () {
+      const c = params.get("c");
+      const t = params.get("t");
+      const q = (params.get("q") || "").trim();
+      const deals = params.get("deals");
+
+      let items = PRODUCTS.slice();
+      let title = "All products";
+
+      if (c && CATEGORIES[c]) {
+        items = items.filter(p => p.category === c);
+        title = CATEGORIES[c];
+      }
+      if (t) {
+        items = items.filter(p => p.tags.some(x => x.toLowerCase() === t.toLowerCase()));
+        title = t;
+      }
+      if (q) {
+        const lq = q.toLowerCase();
+        items = items.filter(p =>
+          (p.name + " " + p.desc + " " + p.tags.join(" ")).toLowerCase().includes(lq));
+        title = 'Results for "' + q + '"';
+      }
+      if (deals) {
+        items = items.filter(p => p.mrp);
+        title = "Today's Deals";
+      }
+
+      document.getElementById("title").textContent = title;
+      document.getElementById("crumb").textContent = title;
+      document.title = title + " – ShopNest";
+
+      function render() {
+        const mode = document.getElementById("sort").value;
+        const list = items.slice();
+        if (mode === "low") list.sort((a, b) => a.price - b.price);
+        if (mode === "high") list.sort((a, b) => b.price - a.price);
+        if (mode === "rating") list.sort((a, b) => b.rating - a.rating);
+
+        document.getElementById("count").textContent =
+          list.length + (list.length === 1 ? " result" : " results");
+        document.getElementById("list").innerHTML = list.length
+          ? list.map(productCardHTML).join("")
+          : '<div class="info" style="grid-column:1/-1"><h2>No products found</h2>' +
+            '<p>Try a different search or browse all categories.</p>' +
+            '<a class="btn" href="page.html?p=all">Browse categories</a></div>';
+      }
+      document.getElementById("sort").addEventListener("change", render);
+      render();
+    })();
+  </script>
+</body>
+</html>
